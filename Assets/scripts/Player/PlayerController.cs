@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour {
     bool lockCursor = true; // should the cursor be locked? or not?
     public float jumpVelocity = 30; // how fast should the player jump?
     public float airControl = .1f; // how well can you move while in the air
+    public float interactDistance = 30;
     
     // Use this for initialization
     void Start () {
@@ -86,6 +87,30 @@ public class PlayerController : MonoBehaviour {
         // apply the modified rotation to the camera
         Camera.main.transform.rotation = Quaternion.Euler(eulerAngles);
 
+        //Interaction code
+
+        //was the interact button pressed down this frame
+        if (Input.GetButtonDown("Interact")) {
+            //the resulting racast info
+            RaycastHit info;
+            //lets cast a ray, and see if it hits anything
+            if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out info, interactDistance)) {
+                // the object we are currently scanning
+                Transform scanning = info.collider.transform;
+                //the interactable we found
+                Interactable interactable = null;
+                //keep looping untill we run out of parents or found an interactable
+                while (scanning != null && interactable == null) {
+                    //try to find an interactable
+                    interactable = scanning.GetComponent<Interactable>();
+                    //move on to the next parent
+                    scanning = scanning.parent;
+                }
+                // if we found an interactable, call it.
+                if(interactable != null)
+                    interactable.OnInteract(gameObject);
+            }
+        }
 
     }
 
