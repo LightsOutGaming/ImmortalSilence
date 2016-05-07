@@ -16,11 +16,16 @@ public class PlayerController : MonoBehaviour {
     public float interactDistance = 30; //the range of the player's interaction
     public GameObject InventoryUI; // the gameobject containing all inventory ui elements
     bool controllsFrozen = false; // should the controlls be frozen?
+    bool pausemenu = false; //is the pause menu being displayed?
+    public GameObject pausemenuobject; //the object that contains the pause menu
+    static public PlayerController instance; //the instance of the active player controller object;
     
     // Use this for initialization
     void Start () {
         // lets get the character controller so we can use it later
         cc = GetComponent<CharacterController>();
+        //set the instance to the active playercontroller object
+        instance = this;
 	}
 	
 	// Update is called once per frame
@@ -136,6 +141,14 @@ public class PlayerController : MonoBehaviour {
             controllsFrozen = InventoryUI.activeInHierarchy;
         }
 
+        //pause menu management
+
+        //check if the pausemenu button was pressed down this frame
+        if (Input.GetButtonDown("PauseMenu")) {
+            //toggle the pausemenu state
+            pauseMenu(!pausemenu);
+        }
+
     }
 
     void FixedUpdate() {
@@ -143,5 +156,17 @@ public class PlayerController : MonoBehaviour {
         cc.Move(movement);
         // reset movement to zero
         movement = Vector3.zero;
+    }
+
+    //called when the pause menu should show up or go away
+    public void pauseMenu(bool active) {
+        //turn on/off the pause menu
+        pausemenu = active;
+        //freeze/unfreeze the player's controlls
+        controllsFrozen = active;
+        //lock/unlock the cursor
+        lockCursor = !active;
+        //activate/deactivate the menu
+        pausemenuobject.SetActive(active);
     }
 }
